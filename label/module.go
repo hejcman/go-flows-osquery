@@ -1,4 +1,4 @@
-package go_flows_osquery
+package label
 
 import (
 	"github.com/CN-TU/go-flows/packet"
