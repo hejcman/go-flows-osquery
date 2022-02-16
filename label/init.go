@@ -1,4 +1,4 @@
-package label
+package osquery_label
 
 import (
 	"fmt"
