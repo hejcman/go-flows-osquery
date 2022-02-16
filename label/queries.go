@@ -21,10 +21,17 @@ func (q *osqueryLabels) execQuery(sql string) ([]map[string]string, error) {
 func (q *osqueryLabels) getProcessPid(packet gopacket.Packet) (string, error) {
 	var srcIp, dstIp, _, _, pid string
 
-	if ipLayer := packet.Layer(layers.LayerTypeIPv4); ipLayer != nil {
-		ip, _ := ipLayer.(*layers.IPv4)
+	if ipLayer4 := packet.Layer(layers.LayerTypeIPv4); ipLayer4 != nil {
+		ip, _ := ipLayer4.(*layers.IPv4)
 		srcIp = ip.SrcIP.String()
 		dstIp = ip.DstIP.String()
+	} else if ipLayer6 := packet.Layer(layers.LayerTypeIPv6); ipLayer6 != nil {
+		ip, _ := ipLayer6.(*layers.IPv6)
+		srcIp = ip.SrcIP.String()
+		dstIp = ip.DstIP.String()
+	} else {
+		srcIp = ""
+		dstIp = ""
 	}
 
 	// TODO: Add parsing for other protocols
@@ -32,21 +39,26 @@ func (q *osqueryLabels) getProcessPid(packet gopacket.Packet) (string, error) {
 		tcp, _ := layer.(*layers.TCP)
 		_ = tcp.SrcPort.String()
 		_ = tcp.DstPort.String()
-
-		// FIXME: Add port specification
-		sql := "SELECT pid FROM process_open_sockets WHERE " +
-			"(local_address='" + srcIp + "' AND " +
-			"remote_address='" + dstIp + "') OR " +
-			"(local_address='" + dstIp + "' AND " +
-			"remote_address='" + srcIp + "') LIMIT 1;\r\n"
-
-		tmp, _ := q.execQuery(sql)
-		if len(tmp) == 0 {
-			pid = ""
-		} else {
-			pid = tmp[0]["pid"]
-		}
+	} else if layer := packet.Layer(layers.LayerTypeUDP); layer != nil {
+		udp, _ := layer.(*layers.UDP)
+		_ = udp.SrcPort.String()
+		_ = udp.DstPort.String()
 	}
+
+	// FIXME: Add port specification
+	sql := "SELECT pid FROM process_open_sockets WHERE " +
+		"(local_address='" + srcIp + "' AND " +
+		"remote_address='" + dstIp + "') OR " +
+		"(local_address='" + dstIp + "' AND " +
+		"remote_address='" + srcIp + "') LIMIT 1;\r\n"
+
+	tmp, _ := q.execQuery(sql)
+	if len(tmp) == 0 {
+		pid = ""
+	} else {
+		pid = tmp[0]["pid"]
+	}
+
 	return pid, nil
 }
 

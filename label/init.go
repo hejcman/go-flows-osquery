@@ -38,7 +38,7 @@ func newOsqueryLabels(args []string) ([]string, util.Module, error) {
 
 // The help string.
 func osqueryLabelsHelp(name string) {
-	_, _ = fmt.Fprintf(os.Stderr, "The only argument to this module must be the path to the osquery socket.")
+	_, _ = fmt.Fprintf(os.Stderr, "The only argument to %s must be the path to the osquery socket.", name)
 }
 
 // Used to register the module as an extension to go-flows.
