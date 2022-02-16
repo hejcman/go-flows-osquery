@@ -19,5 +19,13 @@ func (q *osqueryLabels) Init() {
 }
 
 func (q *osqueryLabels) GetLabel(packet packet.Buffer) (interface{}, error) {
-	return nil, nil
+	processPid, err := q.getProcessPid(packet)
+	if err != nil {
+		return nil, err
+	}
+	processName, err := q.getProcessName(processPid)
+	if err != nil {
+		return nil, err
+	}
+	return processName, nil
 }

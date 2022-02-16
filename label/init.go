@@ -1,8 +1,6 @@
 package label
 
 import (
-	"errors"
-	"flag"
 	"fmt"
 	"os"
 	"time"
@@ -26,43 +24,27 @@ func (q *osqueryLabels) openClient(socket string) (err error) {
 // The constructor for the module.
 func newOsqueryLabels(args []string) ([]string, util.Module, error) {
 
-	var socket string
-
-	// Parsing the arguments
-	flagSet := flag.NewFlagSet("socket", flag.ExitOnError)
-	flagSet.Usage = func() { osqueryLabelsHelp("OsqueryLabels") }
-	flagSet.StringVar(&socket, "socket", "", "The path to the OSQuery socket.")
-
-	err := flagSet.Parse(args)
-	if err != nil {
-		return nil, nil, err
-	}
-
-	if flagSet.NArg() < 1 {
-		return nil, nil, errors.New("no OSQuery socket specified")
-	}
-
 	// Preparing the module
 	module := &osqueryLabels{}
-	err = module.openClient(socket)
+	err := module.openClient(args[0])
 	if err != nil {
 		return nil, nil, err
 	}
-	module.id = fmt.Sprint("osqueryLabels|", args[0])
+	module.id = fmt.Sprint("osqueryLabel|", args[0])
 	module.cache = map[string]string{}
 
-	return flagSet.Args()[1:], module, nil
+	return args[1:], module, nil
 }
 
 // The help string.
 func osqueryLabelsHelp(name string) {
-	_, _ = fmt.Fprintf(os.Stderr, "Help string.")
+	_, _ = fmt.Fprintf(os.Stderr, "The only argument to this module must be the path to the osquery socket.")
 }
 
 // Used to register the module as an extension to go-flows.
 func init() {
 	packet.RegisterLabel(
-		"osqueryLabels",
+		"osquery",
 		"Label packets with OSQuery information.",
 		newOsqueryLabels,
 		osqueryLabelsHelp)
