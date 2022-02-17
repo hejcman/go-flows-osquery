@@ -3,6 +3,7 @@ package osquery_label
 import (
 	"github.com/google/gopacket"
 	"github.com/google/gopacket/layers"
+	"strconv"
 )
 
 // Used as a single entry point for executing SQL requests on the OSQuery client.
@@ -19,7 +20,7 @@ func (q *osqueryLabels) execQuery(sql string) ([]map[string]string, error) {
 // Get the PID of the process which created the packet, or which receives it.
 // This is decided based on the source and destination ports and addresses.
 func (q *osqueryLabels) getProcessPid(packet gopacket.Packet) (string, error) {
-	var srcIp, dstIp, _, _, pid string
+	var srcIp, dstIp, srcPort, dstPort, pid, sql string
 
 	if ipLayer4 := packet.Layer(layers.LayerTypeIPv4); ipLayer4 != nil {
 		ip, _ := ipLayer4.(*layers.IPv4)
@@ -34,23 +35,49 @@ func (q *osqueryLabels) getProcessPid(packet gopacket.Packet) (string, error) {
 		dstIp = ""
 	}
 
-	// TODO: Add parsing for other protocols
+	// TODO: Cleanup.
 	if layer := packet.Layer(layers.LayerTypeTCP); layer != nil {
 		tcp, _ := layer.(*layers.TCP)
-		_ = tcp.SrcPort.String()
-		_ = tcp.DstPort.String()
+		srcPort = strconv.Itoa(int(tcp.SrcPort))
+		dstPort = strconv.Itoa(int(tcp.DstPort))
 	} else if layer := packet.Layer(layers.LayerTypeUDP); layer != nil {
 		udp, _ := layer.(*layers.UDP)
-		_ = udp.SrcPort.String()
-		_ = udp.DstPort.String()
+		srcPort = strconv.Itoa(int(udp.SrcPort))
+		dstPort = strconv.Itoa(int(udp.DstPort))
+	} else if layer := packet.Layer(layers.LayerTypeRUDP); layer != nil {
+		rudp, _ := layer.(*layers.RUDP)
+		srcPort = strconv.Itoa(int(rudp.SrcPort))
+		dstPort = strconv.Itoa(int(rudp.DstPort))
+	} else if layer := packet.Layer(layers.LayerTypeSCTP); layer != nil {
+		sctp, _ := layer.(*layers.SCTP)
+		srcPort = strconv.Itoa(int(sctp.SrcPort))
+		dstPort = strconv.Itoa(int(sctp.DstPort))
+	} else if layer := packet.Layer(layers.LayerTypeUDPLite); layer != nil {
+		udplite, _ := layer.(*layers.UDPLite)
+		srcPort = strconv.Itoa(int(udplite.SrcPort))
+		dstPort = strconv.Itoa(int(udplite.DstPort))
+	} else {
+		srcPort = ""
+		dstPort = ""
 	}
 
-	// FIXME: Add port specification
-	sql := "SELECT pid FROM process_open_sockets WHERE " +
-		"(local_address='" + srcIp + "' AND " +
-		"remote_address='" + dstIp + "') OR " +
-		"(local_address='" + dstIp + "' AND " +
-		"remote_address='" + srcIp + "') LIMIT 1;\r\n"
+	if srcPort == "" && dstPort == "" {
+		sql = "SELECT pid FROM process_open_sockets WHERE " +
+			"(local_address='" + srcIp + "' AND " +
+			"remote_address='" + dstIp + "') OR " +
+			"(local_address='" + dstIp + "' AND " +
+			"remote_address='" + srcIp + "') LIMIT 1;\r\n"
+	} else {
+		sql = "SELECT pid FROM process_open_sockets WHERE (" +
+			"local_address='" + srcIp + "' AND " +
+			"remote_address='" + dstIp + "' AND " +
+			"local_port='" + srcPort + "' AND " +
+			"remote_port='" + dstPort + "') OR (" +
+			"local_address='" + dstIp + "' AND " +
+			"remote_address='" + srcIp + "' AND " +
+			"local_port='" + dstPort + "' AND " +
+			"remote_port='" + srcPort + "') LIMIT 1;\r\n"
+	}
 
 	tmp, _ := q.execQuery(sql)
 	if len(tmp) == 0 {
