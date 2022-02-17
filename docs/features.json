@@ -1,0 +1,22 @@
+{
+    "active_timeout": 1800,
+    "idle_timeout": 300,
+    "features": [
+        "sourceIPAddress",
+        "destinationIPAddress",
+        "protocolIdentifier",
+        "sourceTransportPort",
+        "destinationTransportPort",
+        "flowEndReason",
+        "flowEndNanoseconds",
+        "ipTotalLength"
+    ],
+    "bidirectional": true,
+    "key_features": [
+        "sourceIPAddress",
+        "destinationIPAddress",
+        "protocolIdentifier",
+        "sourceTransportPort",
+        "destinationTransportPort"
+    ]
+}
