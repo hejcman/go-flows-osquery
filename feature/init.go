@@ -32,6 +32,7 @@ func prepareFeature() flows.Feature {
 
 	q := &osqueryFeature{}
 	// Preparing the client
+	// FIXME: Add support for osquery_timeout.
 	err = q.openClient(viper.GetString("osquery_socket"))
 	if err != nil {
 		panic(fmt.Errorf("Fatal error getting osquery socket: %w \n", err))
@@ -51,12 +52,12 @@ func prepareFeature() flows.Feature {
 func init() {
 	// TODO: Include OS info
 	flows.RegisterTemporaryFeature(
-		"__processName",
-		"The name of the process responsible for this flow.",
+		"__osName",
+		"the name of the operating system",
 		ipfix.StringType,
 		0,
 		flows.FlowFeature,
 		prepareFeature,
-		flows.PacketFeature,
+		flows.RawPacket,
 	)
 }
