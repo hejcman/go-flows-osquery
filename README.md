@@ -16,7 +16,7 @@ git clone https://github.com/hejcman/go-flows-osquery.git
 cd ../go-flows-build
 go build
 go get github.com/osquery/osquery-go
-./go-flows-build +go-flows-osquery.label build
+./go-flows-build +go-flows-osquery.label +go-flows-osquery.feature -features.staging build
 ```
 
 ## Running
