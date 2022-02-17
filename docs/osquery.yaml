@@ -1,0 +1,8 @@
+
+# The socket which go-flows-osquery will use to connect to OSQuery.
+# The socket can be found by running osqueryi and executing the command `.socket`.
+osquery_socket: "<SOCKET>"
+
+# The timeout when connecting to osquery in seconds. When this timeout is reached and
+# a connection is not established, the program exists with an error.
+osquery_timeout: 5

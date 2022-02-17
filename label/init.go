@@ -8,6 +8,7 @@ import (
 	"github.com/CN-TU/go-flows/packet"
 	"github.com/CN-TU/go-flows/util"
 	"github.com/osquery/osquery-go"
+	"github.com/spf13/viper"
 )
 
 // Used to prepare the client of the module.
@@ -24,16 +25,26 @@ func (q *osqueryLabels) openClient(socket string) (err error) {
 // The constructor for the module.
 func newOsqueryLabels(args []string) ([]string, util.Module, error) {
 
+	// Parsing the config file
+	viper.SetConfigName("osquery.yaml")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
+	if err != nil {
+		panic(fmt.Errorf("Fatal error config file: %w \n", err))
+	}
+
 	// Preparing the module
 	module := &osqueryLabels{}
-	err := module.openClient(args[0])
+	// FIXME: Use osquery_timeout
+	err = module.openClient(viper.GetString("osquery_socket"))
 	if err != nil {
 		return nil, nil, err
 	}
-	module.id = fmt.Sprint("osqueryLabel|", args[0])
+	module.id = fmt.Sprint("osqueryLabel|", viper.GetString("osquery_socket"))
 	module.cache = map[string]string{}
 
-	return args[1:], module, nil
+	return args, module, nil
 }
 
 // The help string.
