@@ -7,6 +7,23 @@ Specifically, this repository implements two modules, the [label](/label) for la
 packets with process information, and the [feature](/feature) which is used to annotate the final flows
 with system information.
 
+## Supported features
+
+| Feature name                | Description                                     |
+|-----------------------------|-------------------------------------------------|
+| ``__osqueryProcess``        | the process which created the flow              |
+| ``__osqueryKernelVersion``  | kernel version                                  |
+| ``__osqueryOsName``         | distribution or product name                    |
+| ``__osqueryOsVersion``      | pretty, suitable for representation, os version |
+| ``__osqueryOsMajor``        | major release version                           |
+| ``__osqueryOsMinor``        | minor release version                           |
+| ``__osqueryOsPatch``        | optional patch release                          |
+| ``__osqueryOsBuild``        | optional build-specific or variant string       |
+| ``__osqueryOsPlatform``     | os platform or id                               |
+| ``__osqueryOsPlatformLike`` | closely related platforms                       |
+| ``__osqueryOsCodename``     | os version codename                             |
+| ``__osqueryOsArch``         | os architecture                                 |
+
 ## Compiling
 
 ```shell
