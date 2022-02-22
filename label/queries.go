@@ -31,8 +31,7 @@ func (q *osqueryLabels) getProcessPid(packet gopacket.Packet) (string, error) {
 		srcIp = ip.SrcIP.String()
 		dstIp = ip.DstIP.String()
 	} else {
-		srcIp = ""
-		dstIp = ""
+		return "", nil
 	}
 
 	// TODO: Cleanup.

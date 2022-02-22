@@ -7,9 +7,17 @@
         "protocolIdentifier",
         "sourceTransportPort",
         "destinationTransportPort",
-        "flowEndReason",
-        "flowEndNanoseconds",
-        "ipTotalLength"
+        "__osqueryOsName",
+        "__osqueryOsVersion",
+        "__osqueryOsMajor",
+        "__osqueryOsMinor",
+        "__osqueryOsPatch",
+        "__osqueryOsBuild",
+        "__osqueryOsPlatform",
+        "__osqueryOsPlatformLike",
+        "__osqueryOsCodename",
+        "__osqueryOsArch",
+        "__osqueryProcess"
     ],
     "bidirectional": true,
     "key_features": [
