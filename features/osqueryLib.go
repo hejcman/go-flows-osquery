@@ -10,7 +10,7 @@ import (
 type osqueryFeature struct {
 	client *osquery.ExtensionManagerClient
 	flows.BaseFeature
-	tag string
+	tag     string
 	queried bool
 	process bool
 }
@@ -34,10 +34,9 @@ func (c *osqueryFeature) execQuery(sql string) ([]map[string]string, error) {
 	return response.Response, nil
 }
 
-// Get OS info based on a parameter. The parameter is one of the rows of the
-// os_version table of OSQuery: https://www.osquery.io/schema/5.1.0/#os_version
-func (c *osqueryFeature) getOsInfo(param string) (string, error) {
-	sql := "SELECT " + param + " FROM os_version LIMIT 1;"
+// A shared function to get the first result of a row from a specified table.
+func (c *osqueryFeature) getTableInfo(table, column string) (string, error) {
+	sql := "SELECT " + column + " FROM " + table + " LIMIT 1;"
 	tmp, err := c.execQuery(sql)
 	if err != nil {
 		return "", err
@@ -45,10 +44,22 @@ func (c *osqueryFeature) getOsInfo(param string) (string, error) {
 	if len(tmp) == 0 {
 		return "", errors.New("no results found")
 	}
-	if val, exists := tmp[0][param]; exists {
+	if val, exists := tmp[0][column]; exists {
 		return val, nil
 	}
-	return "", errors.New("incorrect param specified")
+	return "", errors.New("incorrect param or table specified")
+}
+
+// Get OS info based on a parameter. The parameter is one of the rows of the
+// os_version table of OSQuery: https://www.osquery.io/schema/5.1.0/#os_version
+func (c *osqueryFeature) getOsInfo(param string) (string, error) {
+	return c.getTableInfo("os_version", param)
+}
+
+// Get kernel info based on a parameter. The parameter is one of the rows of the
+// kernel_info table of OSQuery: https://www.osquery.io/schema/5.1.0/#kernel_info
+func (c *osqueryFeature) getKernelInfo(param string) (string, error) {
+	return c.getTableInfo("kernel_info", param)
 }
 
 // Get the ID of the process which communicates on an open socket, specified by

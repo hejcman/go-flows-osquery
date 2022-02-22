@@ -16,7 +16,7 @@ func (c *osqueryFeature) Start(context *flows.EventContext) {
 }
 
 // Event is called everytime an event occurs on the flows, for example when a packet is added.
-func (c *osqueryFeature) Event(new interface{}, context *flows.EventContext, src interface{}) {
+func (c *osqueryFeature) Event(new interface{}, _ *flows.EventContext, _ interface{}) {
 	if !c.process || c.queried {
 		return
 	}
@@ -80,7 +80,7 @@ func (c *osqueryFeature) Event(new interface{}, context *flows.EventContext, src
 }
 
 // Stop is called when the flow ends.
-func (c *osqueryFeature) Stop(reason flows.FlowEndReason, context *flows.EventContext) {
+func (c *osqueryFeature) Stop(_ flows.FlowEndReason, context *flows.EventContext) {
 	c.BaseFeature.SetValue(c.tag, context, c)
 }
 
@@ -109,7 +109,6 @@ func prepareFeature() *osqueryFeature {
 // Used for specifically preparing OS features, which make a request to the
 // osquery client, cache the results, and then close the connection.
 func prepareOsFeature(param string) *osqueryFeature {
-
 	c := prepareFeature()
 	c.process = false
 	defer c.client.Close()
@@ -118,6 +117,20 @@ func prepareOsFeature(param string) *osqueryFeature {
 	tmp, err := c.getOsInfo(param)
 	if err != nil {
 		panic(fmt.Errorf("Fatal problem getting OS info: %w \n", err))
+	}
+	c.tag = tmp
+	return c
+}
+
+func prepareKernelFeature(param string) *osqueryFeature {
+	c := prepareFeature()
+	c.process = false
+	defer c.client.Close()
+
+	// Caching the specific kernel info
+	tmp, err := c.getKernelInfo(param)
+	if err != nil {
+		panic(fmt.Errorf("Fatal problem getting kernel info: %w \n", err))
 	}
 	c.tag = tmp
 	return c
@@ -135,6 +148,19 @@ func init() {
 		0,
 		flows.FlowFeature,
 		func() flows.Feature { return prepareFeature() },
+		flows.RawPacket)
+
+	/////////////////////
+	// KERNEL FEATURES //
+	/////////////////////
+
+	flows.RegisterTemporaryFeature(
+		"__osqueryKernelVersion",
+		"kernel version",
+		ipfix.StringType,
+		0,
+		flows.FlowFeature,
+		func() flows.Feature { return prepareKernelFeature("version") },
 		flows.RawPacket)
 
 	/////////////////
