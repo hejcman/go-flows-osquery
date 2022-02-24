@@ -26,6 +26,20 @@ Note: using the labels plugin is not tested yet.
 | ``__osqueryOsCodename``     | os version codename                             |
 | ``__osqueryOsArch``         | os architecture                                 |
 
+
+## Running
+
+Either compile go-flows yourself based on the instructions in the [Compile section](#compiling) or download a ready-made
+binary from the [releases](https://github.com/hejcman/go-flows-osquery/releases) page.
+
+The files `features.json` and `osquery.yaml` must be in the same directory as `go-flows`, and they can be found in the
+[docs](/docs) folder. To use osquery features, you need to set the osquery socket correctly in the `osquery.yaml` file.
+Ofcourse, you need to have osquery installed and running (instructions [here](https://osquery.readthedocs.io/en/stable/)).
+
+```shell
+sudo ./go-flows run features features.json export csv test.csv source libpcap -live <ifc>
+```
+
 ## Compiling
 
 ### Compiling on Linux or macOS
@@ -69,12 +83,3 @@ there is no reason to use it as the interfaces names outputed by `ifconfig` work
 
 On Windows, the osquery socket uses backwards slashes for the path. This is not parsable by go-flows, and should be
 replaces by forward slashes. For example, `\\.\pipe\shell.em` should be `//./pipe/shell.em`.
-
-## Running
-
-The files `features.json` and `osquery.yaml` must be in the same directory as `go-flows`. To use `osquery` features, you
-need to set the osquery socket correctly in the `osquery.yaml` file.
-
-```shell
-sudo ./go-flows run features features.json export csv test.csv source libpcap -live <ifc>
-```
