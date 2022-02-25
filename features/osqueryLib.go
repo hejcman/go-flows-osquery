@@ -2,31 +2,44 @@ package osquery_feature
 
 import (
 	"errors"
-	"github.com/CN-TU/go-flows/flows"
-	"github.com/osquery/osquery-go"
+	"fmt"
 	"time"
+
+	"github.com/osquery/osquery-go"
+	"github.com/spf13/viper"
 )
 
-type osqueryFeature struct {
+type osqueryClient struct {
 	client *osquery.ExtensionManagerClient
-	flows.BaseFeature
-	tag     string
-	queried bool
-	process bool
 }
 
-// Used to open a connection to the OSQuery client.
-func (c *osqueryFeature) openClient(socket string) (err error) {
-	client, err := osquery.NewClient(socket, 10*time.Second)
+// getConfigParam parses the config file and returns the value of the specified parameter.
+func getConfigParam(param string) string {
+	viper.SetConfigName("osquery.yaml")
+	viper.SetConfigType("yaml")
+	viper.AddConfigPath(".")
+	err := viper.ReadInConfig()
 	if err != nil {
-		return err
+		panic(fmt.Errorf("Fatal error when reading config file: %w \n", err))
 	}
-	c.client = client
-	return nil
+
+	return viper.GetString(param)
 }
 
-// A general function for executing OSQuery queries.
-func (c *osqueryFeature) execQuery(sql string) ([]map[string]string, error) {
+// getOsqueryClient prepares a connection to the osquery daemon.
+func getOsqueryClient() *osqueryClient {
+	client, err := osquery.NewClient(getConfigParam("osquery_socket"), 10*time.Second)
+	if err != nil {
+		panic(fmt.Errorf("Fatal error getting osquery socket: %w \n", err))
+		return nil
+	}
+	return &osqueryClient{
+		client: client,
+	}
+}
+
+// execQuery is a general function for executing OSQuery queries.
+func (c *osqueryClient) execQuery(sql string) ([]map[string]string, error) {
 	response, err := c.client.Query(sql)
 	if err != nil {
 		return nil, err
@@ -34,8 +47,8 @@ func (c *osqueryFeature) execQuery(sql string) ([]map[string]string, error) {
 	return response.Response, nil
 }
 
-// A shared function to get the first result of a row from a specified table.
-func (c *osqueryFeature) getTableInfo(table, column string) (string, error) {
+// getTableInfo is a shared function to get the first result of a row from a specified table.
+func (c *osqueryClient) getTableInfo(table, column string) (string, error) {
 	sql := "SELECT " + column + " FROM " + table + " LIMIT 1;"
 	tmp, err := c.execQuery(sql)
 	if err != nil {
@@ -50,22 +63,22 @@ func (c *osqueryFeature) getTableInfo(table, column string) (string, error) {
 	return "", errors.New("incorrect param or table specified")
 }
 
-// Get OS info based on a parameter. The parameter is one of the rows of the
+// getOsInfo based on a parameter. The parameter is one of the rows of the
 // os_version table of OSQuery: https://www.osquery.io/schema/5.1.0/#os_version
-func (c *osqueryFeature) getOsInfo(param string) (string, error) {
+func (c *osqueryClient) getOsInfo(param string) (string, error) {
 	return c.getTableInfo("os_version", param)
 }
 
-// Get kernel info based on a parameter. The parameter is one of the rows of the
+// getKernelInfo based on a parameter. The parameter is one of the rows of the
 // kernel_info table of OSQuery: https://www.osquery.io/schema/5.1.0/#kernel_info
-func (c *osqueryFeature) getKernelInfo(param string) (string, error) {
+func (c *osqueryClient) getKernelInfo(param string) (string, error) {
 	return c.getTableInfo("kernel_info", param)
 }
 
-// Get the ID of the process which communicates on an open socket, specified by
+// getProcessID gets the ID of the process which communicates on an open socket, specified by
 // the source and destination IP addresses and ports. If no such socket is found,
 // returns an empty string and an error.
-func (c *osqueryFeature) getProcessID(srcIp, dstIp, srcPort, dstPort string) (string, error) {
+func (c *osqueryClient) getProcessID(srcIp, dstIp, srcPort, dstPort string) (string, error) {
 	var sql string
 
 	if srcPort == "" || dstPort == "" {
@@ -96,9 +109,9 @@ func (c *osqueryFeature) getProcessID(srcIp, dstIp, srcPort, dstPort string) (st
 	return tmp[0]["pid"], nil
 }
 
-// Gets the name of the process based on the process ID. When no process
+// getProcessName gets the name of the process based on the process ID. When no process
 // with the specified PID is found, return empty string and error.
-func (c *osqueryFeature) getProcessName(pid string) (string, error) {
+func (c *osqueryClient) getProcessName(pid string) (string, error) {
 	sql := "SELECT name FROM processes WHERE pid='" + pid + "' LIMIT 1;"
 	tmp, err := c.execQuery(sql)
 	if err != nil {
