@@ -16,13 +16,12 @@ func registerCesnetFeatures() {
 func registerCesnetProcessFeatures() {
 	// PROCESS NAME
 	flows.RegisterFeature(
-		ipfix.InformationElement{
-			Name:   "OSQueryProgramName",
-			Pen:    CesnetPen,
-			ID:     852,
-			Type:   ipfix.StringType,
-			Length: ipfix.VariableLength,
-		},
+		ipfix.NewInformationElement(
+			"OSQueryProgramName",
+			CesnetPen,
+			852,
+			ipfix.StringType,
+			ipfix.VariableLength),
 		"the process which created the flow",
 		flows.FlowFeature,
 		func() flows.Feature { return &processFeature{} },
@@ -34,13 +33,12 @@ func registerCesnetProcessFeatures() {
 func registerCesnetKernelFeatures() {
 	// KERNEL VERSION
 	flows.RegisterFeature(
-		ipfix.InformationElement{
-			Name:   "OSQueryKernelVersion",
-			Pen:    CesnetPen,
-			ID:     861,
-			Type:   ipfix.StringType,
-			Length: ipfix.VariableLength,
-		},
+		ipfix.NewInformationElement(
+			"OSQueryKernelVersion",
+			CesnetPen,
+			861,
+			ipfix.StringType,
+			ipfix.VariableLength),
 		"kernel version",
 		flows.FlowFeature,
 		func() flows.Feature { return prepareKernelFeature("version") },
@@ -123,13 +121,12 @@ func registerCesnetOsFeatures() {
 		flows.RawPacket)
 	//// OS ARCH
 	flows.RegisterFeature(
-		ipfix.InformationElement{
-			Name:   "OSQueryOSArch",
-			Pen:    CesnetPen,
-			ID:     860,
-			Type:   ipfix.StringType,
-			Length: ipfix.VariableLength,
-		},
+		ipfix.NewInformationElement(
+			"OSQueryOSArch",
+			CesnetPen,
+			860,
+			ipfix.StringType,
+			ipfix.VariableLength),
 		"os architecture",
 		flows.FlowFeature,
 		func() flows.Feature { return prepareOsFeature("arch", ipfix.StringType) },

@@ -11,21 +11,20 @@ Note: using the labels plugin is not tested yet.
 
 ## Supported features
 
-| Feature name                | Description                                     |
-|-----------------------------|-------------------------------------------------|
-| ``__osqueryProcess``        | the process which created the flow              |
-| ``__osqueryKernelVersion``  | kernel version                                  |
-| ``__osqueryOsName``         | distribution or product name                    |
-| ``__osqueryOsVersion``      | pretty, suitable for representation, os version |
-| ``__osqueryOsMajor``        | major release version                           |
-| ``__osqueryOsMinor``        | minor release version                           |
-| ``__osqueryOsPatch``        | optional patch release                          |
-| ``__osqueryOsBuild``        | optional build-specific or variant string       |
-| ``__osqueryOsPlatform``     | os platform or id                               |
-| ``__osqueryOsPlatformLike`` | closely related platforms                       |
-| ``__osqueryOsCodename``     | os version codename                             |
-| ``__osqueryOsArch``         | os architecture                                 |
-
+| CESNET feature name     | Temporary feature name      | Description                                     |
+|-------------------------|-----------------------------|-------------------------------------------------|
+| `OSQueryProgramName`    | ``__osqueryProcess``        | the process which created the flow              |
+| `OSQueryKernelVersion`  | ``__osqueryKernelVersion``  | kernel version                                  |
+| `OSQueryOSName`         | ``__osqueryOsName``         | distribution or product name                    |
+| ---                     | ``__osqueryOsVersion``      | pretty, suitable for representation, os version |
+| `OSQueryOSMajor`        | ``__osqueryOsMajor``        | major release version                           |
+| `OSQueryOSMinor`        | ``__osqueryOsMinor``        | minor release version                           |
+| ---                     | ``__osqueryOsPatch``        | optional patch release                          |
+| `OSQueryOSBuild`        | ``__osqueryOsBuild``        | optional build-specific or variant string       |
+| `OSQueryOSPlatform`     | ``__osqueryOsPlatform``     | os platform or id                               |
+| `OSQueryOSPlatformLike` | ``__osqueryOsPlatformLike`` | closely related platforms                       |
+| ---                     | ``__osqueryOsCodename``     | os version codename                             |
+| `OSQueryOSArch`         | ``__osqueryOsArch``         | os architecture                                 |
 
 ## Running
 
@@ -41,6 +40,9 @@ sudo ./go-flows run features features.json export csv test.csv source libpcap -l
 ```
 
 ## Compiling
+
+By default, the compiled version is using the CESNET fields. However, if you want to use the temporary fields, pass the
+following flag to `go build`: `-ldflag="-X 'github.com/hejcman/go-flows-osquery/features.BuildType=TEMPORARY'"`
 
 ### Compiling on Linux or macOS
 
