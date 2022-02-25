@@ -11,6 +11,8 @@ Note: using the labels plugin is not tested yet.
 
 ## Supported features
 
+The CESNET features are designed so that they are compatible with the definitions in [libfds](https://github.com/CESNET/libfds), including the name, PEN, ID, and type. The temporary features are useful for local output.
+
 | CESNET feature name     | Temporary feature name      | Description                                     |
 |-------------------------|-----------------------------|-------------------------------------------------|
 | `OSQueryProgramName`    | ``__osqueryProcess``        | the process which created the flow              |
@@ -42,7 +44,11 @@ sudo ./go-flows run features features.json export csv test.csv source libpcap -l
 ## Compiling
 
 By default, the compiled version is using the CESNET fields. However, if you want to use the temporary fields, pass the
-following flag to `go build`: `-ldflag="-X 'github.com/hejcman/go-flows-osquery/features.BuildType=TEMPORARY'"`
+following flag to `go build`:
+
+```shell
+-ldflag="-X 'github.com/hejcman/go-flows-osquery/features.BuildType=TEMPORARY'"
+```
 
 ### Compiling on Linux or macOS
 
