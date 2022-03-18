@@ -30,8 +30,7 @@ The CESNET features are designed so that they are compatible with the definition
 
 ## Running
 
-Either compile go-flows yourself based on the instructions in the [Compile section](#compiling) or download a ready-made
-binary from the [releases](https://github.com/hejcman/go-flows-osquery/releases) page.
+Compile go-flows based on the instructions in the [Compile section](#compiling).
 
 The files `features.json` and `osquery.yaml` must be in the same directory as `go-flows`, and they can be found in the
 [docs](/docs) folder. To use osquery features, you need to set the osquery socket correctly in the `osquery.yaml` file.
@@ -42,14 +41,6 @@ sudo ./go-flows run features features.json export csv test.csv source libpcap -l
 ```
 
 ## Compiling
-
-By default, the compiled version is using the CESNET fields. However, if you want to use the temporary fields, pass the
-following flag to `go build`:
-
-```shell
--ldflag="-X 'github.com/hejcman/go-flows-osquery/features.BuildType=TEMPORARY'"
-```
-
 ### Compiling on Linux or macOS
 
 Compiling on Linux or macOS is quite straightforward:
