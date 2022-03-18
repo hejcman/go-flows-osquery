@@ -1,11 +1,10 @@
 package osquery_feature
 
 import (
-	"strconv"
-
 	"github.com/CN-TU/go-flows/flows"
 	"github.com/CN-TU/go-flows/packet"
 	"github.com/google/gopacket/layers"
+	"strconv"
 )
 
 type processFeature struct {
@@ -29,6 +28,22 @@ func (procf *processFeature) Event(new interface{}, context *flows.EventContext,
 	var srcIp, dstIp, srcPort, dstPort, process string
 
 	buf := new.(packet.Buffer)
+
+	// First, we filter common protocols that make no sense associating with a process to speed up execution.
+	if layer := buf.Layer(layers.LayerTypeDNS); layer != nil {
+		process = "DNS"
+	} else if layer := buf.Layer(layers.LayerTypeDHCPv4); layer != nil {
+		process = "DHCPv4"
+	} else if layer := buf.Layer(layers.LayerTypeDHCPv6); layer != nil {
+		process = "DHCPv6"
+	}
+
+	if process != "" {
+		procf.SetValue(process, context, procf)
+		// TODO: Fix this, this is ugly.
+		procf.client.client.Close()
+		return
+	}
 
 	// Deciding what IP version is used
 	if ipLayer4 := buf.Layer(layers.LayerTypeIPv4); ipLayer4 != nil {
@@ -72,15 +87,17 @@ func (procf *processFeature) Event(new interface{}, context *flows.EventContext,
 	// Getting the name of the process and closing the connection to OSQuery
 	pid, err := procf.client.getProcessID(srcIp, dstIp, srcPort, dstPort)
 	if err != nil {
+		procf.SetValue("unknown", context, procf)
+		procf.client.client.Close()
 		return
 	}
 	process, err = procf.client.getProcessName(pid)
 	if err != nil {
+		procf.SetValue("unknown", context, procf)
+		procf.client.client.Close()
 		return
 	}
-	if process == "" {
-		process = "unknown"
-	}
+
 	procf.SetValue(process, context, procf)
 	// TODO: Fix this, this is ugly.
 	procf.client.client.Close()

@@ -5,16 +5,28 @@ import (
 	"github.com/CN-TU/go-ipfix"
 )
 
-func registerCesnetFeatures() {
-	registerCesnetProcessFeatures()
-	registerCesnetKernelFeatures()
-	registerCesnetOsFeatures()
-}
+/*
+╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+│ Common variables and definitions │
+╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+*/
 
-// registerCesnetProcessFeatures registers CESNET features
-// regarding the process annotated to the flow.
-func registerCesnetProcessFeatures() {
-	// PROCESS NAME
+// CesnetPen is the pen of CESNET, as defined by RFC 7013
+// https://datatracker.ietf.org/doc/html/draft-ietf-ipfix-ie-doctors#section-10.1
+var CesnetPen uint32 = 8057
+
+/*
+╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+│ Init function │
+╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+*/
+
+func init() {
+
+	// ╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+	// │ Process Name │
+	// ╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryProgramName",
@@ -27,11 +39,11 @@ func registerCesnetProcessFeatures() {
 		func() flows.Feature { return &processFeature{} },
 		flows.RawPacket,
 	)
-}
 
-// registerCesnetKernelFeatures registers CESNET features regarding the OS kernel
-func registerCesnetKernelFeatures() {
-	// KERNEL VERSION
+	// ╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+	// │ Kernel version │
+	// ╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryKernelVersion",
@@ -43,11 +55,11 @@ func registerCesnetKernelFeatures() {
 		flows.FlowFeature,
 		func() flows.Feature { return prepareKernelFeature("version") },
 		flows.RawPacket)
-}
 
-// registerCesnetOsFeatures registers CESNET features regarding the OS information
-func registerCesnetOsFeatures() {
-	// OS NAME
+	// ╭╶╶╶╶╶╶╶╶╶╮
+	// │ OS Name │
+	// ╰╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryOSName",
@@ -59,7 +71,11 @@ func registerCesnetOsFeatures() {
 		flows.FlowFeature,
 		func() flows.Feature { return prepareOsFeature("major", ipfix.StringType) },
 		flows.RawPacket)
-	// OS MAJOR VERSION
+
+	// ╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+	// │ OS Major Version │
+	// ╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryOSMajor",
@@ -71,7 +87,11 @@ func registerCesnetOsFeatures() {
 		flows.FlowFeature,
 		func() flows.Feature { return prepareOsFeature("major", ipfix.Unsigned16Type) },
 		flows.RawPacket)
-	// OS MINOR VERSION
+
+	// ╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+	// │ OS Minor Version │
+	// ╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryOSMinor",
@@ -83,7 +103,11 @@ func registerCesnetOsFeatures() {
 		flows.FlowFeature,
 		func() flows.Feature { return prepareOsFeature("minor", ipfix.Unsigned16Type) },
 		flows.RawPacket)
-	// OS PATCH VERSION
+
+	// ╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+	// │ OS Patch Version │
+	// ╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryOSBuild",
@@ -95,7 +119,11 @@ func registerCesnetOsFeatures() {
 		flows.FlowFeature,
 		func() flows.Feature { return prepareOsFeature("build", ipfix.StringType) },
 		flows.RawPacket)
-	// OS PLATFORM
+
+	// ╭╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+	// │ OS Platform │
+	// ╰╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryOSPlatform",
@@ -107,7 +135,11 @@ func registerCesnetOsFeatures() {
 		flows.FlowFeature,
 		func() flows.Feature { return prepareOsFeature("platform", ipfix.StringType) },
 		flows.RawPacket)
-	// OS PLATFORM-LIKE
+
+	// ╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+	// │ OS Platform like │
+	// ╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryOSPlatformLike",
@@ -119,7 +151,11 @@ func registerCesnetOsFeatures() {
 		flows.FlowFeature,
 		func() flows.Feature { return prepareOsFeature("platform_like", ipfix.StringType) },
 		flows.RawPacket)
-	//// OS ARCH
+
+	// ╭╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╶╮
+	// │ OS Architecture │
+	// ╰╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╴╯
+
 	flows.RegisterFeature(
 		ipfix.NewInformationElement(
 			"OSQueryOSArch",
@@ -131,4 +167,5 @@ func registerCesnetOsFeatures() {
 		flows.FlowFeature,
 		func() flows.Feature { return prepareOsFeature("arch", ipfix.StringType) },
 		flows.RawPacket)
+
 }
