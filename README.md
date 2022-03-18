@@ -13,20 +13,20 @@ Note: using the labels plugin is not tested yet.
 
 The CESNET features are designed so that they are compatible with the definitions in [libfds](https://github.com/CESNET/libfds), including the name, PEN, ID, and type. The temporary features are useful for local output.
 
-| CESNET feature name     | Temporary feature name      | Description                                     |
-|-------------------------|-----------------------------|-------------------------------------------------|
-| `OSQueryProgramName`    | ``__osqueryProcess``        | the process which created the flow              |
-| `OSQueryKernelVersion`  | ``__osqueryKernelVersion``  | kernel version                                  |
-| `OSQueryOSName`         | ``__osqueryOsName``         | distribution or product name                    |
-| ---                     | ``__osqueryOsVersion``      | pretty, suitable for representation, os version |
-| `OSQueryOSMajor`        | ``__osqueryOsMajor``        | major release version                           |
-| `OSQueryOSMinor`        | ``__osqueryOsMinor``        | minor release version                           |
-| ---                     | ``__osqueryOsPatch``        | optional patch release                          |
-| `OSQueryOSBuild`        | ``__osqueryOsBuild``        | optional build-specific or variant string       |
-| `OSQueryOSPlatform`     | ``__osqueryOsPlatform``     | os platform or id                               |
-| `OSQueryOSPlatformLike` | ``__osqueryOsPlatformLike`` | closely related platforms                       |
-| ---                     | ``__osqueryOsCodename``     | os version codename                             |
-| `OSQueryOSArch`         | ``__osqueryOsArch``         | os architecture                                 |
+| CESNET feature name     | Description                                     |
+|-------------------------|-------------------------------------------------|
+| `OSQueryProgramName`    | the process which created the flow              |
+| `OSQueryKernelVersion`  | kernel version                                  |
+| `OSQueryOSName`         | distribution or product name                    |
+| ---                     | pretty, suitable for representation, os version |
+| `OSQueryOSMajor`        | major release version                           |
+| `OSQueryOSMinor`        | minor release version                           |
+| ---                     | optional patch release                          |
+| `OSQueryOSBuild`        | optional build-specific or variant string       |
+| `OSQueryOSPlatform`     | os platform or id                               |
+| `OSQueryOSPlatformLike` | closely related platforms                       |
+| ---                     | os version codename                             |
+| `OSQueryOSArch`         | os architecture                                 |
 
 ## Running
 
