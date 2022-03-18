@@ -11,7 +11,7 @@ Note: using the labels plugin is not tested yet.
 
 ## Supported features
 
-The CESNET features are designed so that they are compatible with the definitions in [libfds](https://github.com/CESNET/libfds), including the name, PEN, ID, and type. The temporary features are useful for local output.
+The CESNET features are designed so that they are compatible with the definitions in [libfds](https://github.com/CESNET/libfds), including the name, PEN, ID, and type.
 
 | CESNET feature name     | Description                                     |
 |-------------------------|-------------------------------------------------|
